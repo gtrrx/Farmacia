@@ -10,7 +10,7 @@ if ($mysqli->connect_errno) {
 die("Erro de conexão: " . $mysqli->connect_error);
 }
 
-// Atualizar produto
+
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["id_produto"])) {
 $id = $_POST["id_produto"];
 $nome = $_POST["nome"];
@@ -19,6 +19,14 @@ $quantidade = $_POST["quantidade"];
 
 $stmt = $mysqli->prepare("UPDATE produtos SET nome=?, preco=?, quantidade=? WHERE id_produto=?");
 $stmt->bind_param("sdii", $nome, $preco, $quantidade, $id);
+$stmt->execute();
+$stmt->close();
+}
+
+if ($_POST["acao"] === "excluir" && isset($_POST["id_produto"])) {
+$id = $_POST["id_produto"];
+$stmt = $mysqli->prepare("DELETE FROM produtos WHERE id_produto=?");
+$stmt->bind_param("i", $id);
 $stmt->execute();
 $stmt->close();
 }
@@ -59,6 +67,7 @@ $result = $mysqli->query("SELECT * FROM produtos");
 <td>
 <input type="hidden" name="id_produto" value="<?= $produto["id_produto"] ?>">
 <button type="submit">Salvar</button>
+ <button type="submit" name="acao" value="excluir" class="excluir" onclick="return confirm('Tem certeza que deseja excluir este item?')">Excluir</button>
 </td>
 </form>
 </tr>
